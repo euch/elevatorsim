@@ -8,4 +8,3 @@ object SafetyStatus {
   case object Red extends SafetyStatus
 }
 case class SafetyRecord(sensorName: String, safetyStatus: SafetyStatus)
-
