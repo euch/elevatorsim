@@ -11,10 +11,10 @@ case class VariableSpeedWinch(
     override val dimensions: Dimensions,
     speedUpAccelerations: VerticalAccelerations,
     slowDownAccelerations: VerticalAccelerations
-) extends Winch 
+) extends Winch
 
 case class VerticalAccelerations(upwards: Double, downwards: Double) {
   def get(direction: Direction): Double = direction match
-    case Direction.Up => upwards
+    case Direction.Up   => upwards
     case Direction.Down => downwards
 }

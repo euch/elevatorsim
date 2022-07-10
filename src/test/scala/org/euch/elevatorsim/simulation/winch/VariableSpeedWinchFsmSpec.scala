@@ -12,7 +12,7 @@ import org.scalatest.wordspec.{AnyWordSpec, AnyWordSpecLike}
 import java.time.Instant
 import scala.annotation.tailrec
 import scala.concurrent.duration.*
-import scala.math.{Pi, abs}
+import scala.math.abs
 
 class VariableSpeedWinchFsmSpec
     extends ScalaTestWithActorTestKit
@@ -94,7 +94,7 @@ class VariableSpeedWinchFsmSpec
         val now = Instant.now()
         winchActor ! WinchCommand.GetSpeed(now, probe.ref)
         val speed: Double = probe.receiveMessage(20.millis)
-        assert (abs(speed) < runawaySpeed)
+        assert(abs(speed) < runawaySpeed)
         if (abs(speed) < abs(targetSpeed)) {
           // println(s"speedUp: $speed -> $targetSpeed")
           waitForSpeedUp(targetSpeed)
@@ -108,7 +108,7 @@ class VariableSpeedWinchFsmSpec
         val now = Instant.now()
         winchActor ! WinchCommand.GetSpeed(now, probe.ref)
         val speed: Double = probe.receiveMessage(20.millis)
-        assert (abs(speed) < runawaySpeed)
+        assert(abs(speed) < runawaySpeed)
         if (abs(speed) > abs(targetSpeed)) {
           // println(s"slowDown: $speed -> $targetSpeed")
           waitForSlowDown(targetSpeed)
