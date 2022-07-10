@@ -5,6 +5,7 @@ import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import org.euch.elevatorsim.Log.log
 import org.euch.elevatorsim.domain.model.Direction
 import org.euch.elevatorsim.domain.model.winch.*
+import org.euch.elevatorsim.simulation.winch.*
 
 import java.time.Instant
 import scala.concurrent.duration.*
@@ -15,16 +16,16 @@ object WinchActor {
 
   // initial state
   def apply(winch: Winch): Behavior[WinchCommand] =
-    idle(winch, WinchState.Stopped)
+    idle(winch, WinchState.Stopped(SpeedAtTime(Instant.now(), 0)))
 
   private def idle(
       winch: Winch,
-      state: WinchState.Stopped.type
+      state: WinchState.Stopped
   ): Behavior[WinchCommand] =
     Behaviors.receiveMessagePartial[WinchCommand] {
       case t: WinchCommand.MoveCommand =>
         log.info(s"${winch.name} idle -> speedUp")
-        speedUp(winch, WinchState.SpeedUp(t.direction, t.now, winch))
+        speedUp(winch, WinchState.SpeedUp(t.direction, SpeedAtTime(t.now, state.speed(t.now)), winch))
       case WinchCommand.GetSpeed(now, replyTo) =>
         replyTo ! state.speed(now)
         Behaviors.unhandled
@@ -40,13 +41,16 @@ object WinchActor {
         case Tick(now)
             if state.speed(now) >= winch.getNominalSpeed(state.direction) =>
           log.info(s"${winch.name} speedUp -> run")
-          run(winch, WinchState.Run(state.direction, now, winch))
+          run(winch, WinchState.Run(state.direction, SpeedAtTime(now, state.speed(now)), winch))
         case WinchCommand.GetSpeed(now, replyTo) =>
           replyTo ! state.speed(now)
           Behaviors.unhandled
+        case t: WinchCommand.MoveCommand =>
+          log.info(s"${winch.name} speedUp -> 0 -> speedUp (direction change)")
+          speedUp(winch, WinchState.SpeedUp(t.direction, SpeedAtTime(t.now, state.speed(t.now)), winch))
         case WinchCommand.Stop(now) =>
           log.info(s"${winch.name} speedUp -> slowDown")
-          slowDown(winch, WinchState.SlowDown(state.direction, now, winch))
+          slowDown(winch, WinchState.SlowDown(state.direction, SpeedAtTime(now, state.speed(now)), winch))
       }
     }
   }
@@ -61,7 +65,7 @@ object WinchActor {
         Behaviors.unhandled
       case WinchCommand.Stop(now) =>
         log.info(s"${winch.name} run -> slowDown")
-        slowDown(winch, WinchState.SlowDown(state.direction, now, winch))
+        slowDown(winch, WinchState.SlowDown(state.direction, SpeedAtTime(now, state.speed(now)), winch))
     }
   }
 
@@ -74,10 +78,10 @@ object WinchActor {
       Behaviors.receiveMessagePartial {
         case Tick(now) if state.speed(now) >= 0 =>
           log.info(s"${winch.name} slowDown -> idle")
-          idle(winch, WinchState.Stopped)
+          idle(winch, WinchState.Stopped(SpeedAtTime(now, state.speed(now))))
         case t: WinchCommand.MoveCommand =>
           log.info(s"${winch.name} slowDown -> speedUp")
-          speedUp(winch, WinchState.SpeedUp(t.direction, t.now, winch))
+          speedUp(winch, WinchState.SpeedUp(t.direction, SpeedAtTime(t.now, state.speed(t.now)), winch))
         case WinchCommand.GetSpeed(now, replyTo) =>
           replyTo ! state.speed(now)
           Behaviors.unhandled
