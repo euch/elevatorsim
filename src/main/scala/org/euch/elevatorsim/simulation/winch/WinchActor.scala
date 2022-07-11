@@ -12,20 +12,21 @@ import scala.concurrent.duration.*
 
 object WinchActor {
 
-  private case class Tick(override val now: Instant) extends WinchCommand
+  private case class Tick(now: Instant) extends WinchCommand
 
   // initial state
   def apply(winch: Winch): Behavior[WinchCommand] =
-    idle(WinchState.Stopped(SpeedAtTime(Instant.now(), 0), winch))
+    idle(WinchState.Stopped(winch))
 
-  private def idle(state: WinchState.Stopped): Behavior[WinchCommand] =
+  private def idle(state: WinchState.Stopped): Behavior[WinchCommand] = {
+    log.info(s"idle state: $state")
     Behaviors.receiveMessagePartial[WinchCommand] {
       case t: WinchCommand.MoveCommand =>
         log.info(s"${state.winch.name} idle -> speedUp")
         speedUp(
-          WinchState.SpeedUp(
+          WinchState.Moving.NonLinearMoving.SpeedUp(
             t.direction,
-            SpeedAtTime(t.now, state.speed(t.now)),
+            SpeedAtTime(t.now, 0),
             state.winch
           )
         )
@@ -33,19 +34,22 @@ object WinchActor {
         replyTo ! state.speed(now)
         Behaviors.unhandled
     }
+  }
 
-  private def speedUp(state: WinchState.SpeedUp): Behavior[WinchCommand] = {
+  private def speedUp(
+      state: WinchState.Moving.NonLinearMoving.SpeedUp
+  ): Behavior[WinchCommand] = {
     Behaviors.withTimers[WinchCommand] { timers =>
-      timers.startSingleTimer(Tick(Instant.now), 100.millis)
+      timers.startSingleTimer(Tick(Instant.now), 10.millis)
+      log.info(s"speedup state: $state")
       Behaviors.receiveMessagePartial[WinchCommand] {
         case Tick(now)
             if state
               .speed(now) >= state.winch.getNominalSpeed(state.direction) =>
           log.info(s"${state.winch.name} speedUp -> run")
           run(
-            WinchState.Run(
+            WinchState.Moving.LinearMoving.Run(
               state.direction,
-              SpeedAtTime(now, state.speed(now)),
               state.winch
             )
           )
@@ -53,11 +57,9 @@ object WinchActor {
           replyTo ! state.speed(now)
           Behaviors.unhandled
         case t: WinchCommand.MoveCommand =>
-          log.info(
-            s"${state.winch.name} speedUp -> 0 -> speedUp (direction change)"
-          )
+          log.info(s"${state.winch.name} speedUp -> 0 -> speedUp")
           speedUp(
-            WinchState.SpeedUp(
+            WinchState.Moving.NonLinearMoving.SpeedUp(
               t.direction,
               SpeedAtTime(t.now, state.speed(t.now)),
               state.winch
@@ -66,7 +68,7 @@ object WinchActor {
         case WinchCommand.Stop(now) =>
           log.info(s"${state.winch.name} speedUp -> slowDown")
           slowDown(
-            WinchState.SlowDown(
+            WinchState.Moving.NonLinearMoving.SlowDown(
               state.direction,
               SpeedAtTime(now, state.speed(now)),
               state.winch
@@ -76,7 +78,10 @@ object WinchActor {
     }
   }
 
-  private def run(state: WinchState.Run): Behavior[WinchCommand] = {
+  private def run(
+      state: WinchState.Moving.LinearMoving.Run
+  ): Behavior[WinchCommand] = {
+    log.info(s"run state: $state")
     Behaviors.receiveMessagePartial {
       case WinchCommand.GetSpeed(now, replyTo) =>
         replyTo ! state.speed(now)
@@ -84,7 +89,7 @@ object WinchActor {
       case WinchCommand.Stop(now) =>
         log.info(s"${state.winch.name} run -> slowDown")
         slowDown(
-          WinchState.SlowDown(
+          WinchState.Moving.NonLinearMoving.SlowDown(
             state.direction,
             SpeedAtTime(now, state.speed(now)),
             state.winch
@@ -93,19 +98,22 @@ object WinchActor {
     }
   }
 
-  private def slowDown(state: WinchState.SlowDown): Behavior[WinchCommand] = {
+  private def slowDown(
+      state: WinchState.Moving.NonLinearMoving.SlowDown
+  ): Behavior[WinchCommand] = {
     Behaviors.withTimers[WinchCommand] { timers =>
-      timers.startSingleTimer(Tick(Instant.now), 100.millis)
+      timers.startSingleTimer(Tick(Instant.now), 10.millis)
+      log.info(s"slowdown state: $state")
       Behaviors.receiveMessagePartial {
         case Tick(now) if state.speed(now) >= 0 =>
           log.info(s"${state.winch.name} slowDown -> idle")
           idle(
-            WinchState.Stopped(SpeedAtTime(now, state.speed(now)), state.winch)
+            WinchState.Stopped(state.winch)
           )
         case t: WinchCommand.MoveCommand =>
           log.info(s"${state.winch.name} slowDown -> speedUp")
           speedUp(
-            WinchState.SpeedUp(
+            WinchState.Moving.NonLinearMoving.SpeedUp(
               t.direction,
               SpeedAtTime(t.now, state.speed(t.now)),
               state.winch

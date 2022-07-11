@@ -3,8 +3,8 @@ package org.euch.elevatorsim.simulation.model.fitting.space
 import org.euch.elevatorsim.domain.model.*
 import org.euch.elevatorsim.domain.model.loads.LoadGroup
 import org.euch.elevatorsim.domain.model.transport.*
-import org.euch.elevatorsim.simulation.model.fitting.space.SpaceFittingRules
 import org.euch.elevatorsim.simulation.model.fitting.FitResult
+import org.euch.elevatorsim.simulation.model.fitting.space.SpaceFittingRules
 
 class FitBySquareRejectByOrder extends SpaceFittingRules {
 

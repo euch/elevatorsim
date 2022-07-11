@@ -15,7 +15,7 @@ import org.euch.elevatorsim.simulation.winch.*
 
 import java.time.Instant
 
-object ElevatorSim {
+object Main {
 
   def apply(): Behavior[WinchCommand] = {
     Behaviors.setup { context =>
@@ -35,7 +35,7 @@ object ElevatorSim {
   }
 
   def main(args: Array[String]): Unit = {
-    ActorSystem(ElevatorSim(), "Elevatorsim")
+    ActorSystem(Main(), "Elevatorsim")
   }
 
 }
