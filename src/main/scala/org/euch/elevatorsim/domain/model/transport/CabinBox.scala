@@ -15,4 +15,4 @@ class CabinBox(
     override val innerDimensions: DimensionsBox,
     override val loads: List[Load] = List.empty,
     override val defaultFloor: Option[String]
-) extends Transport {}
+) extends Transport

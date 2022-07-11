@@ -1,9 +1,8 @@
 package org.euch.elevatorsim.domain.model.doors
 
+import org.euch.elevatorsim.domain.model.body.Body
 import org.euch.elevatorsim.domain.model.{SafetyRecord, SafetyStatus}
 
-trait Door {
-  val name: String
-  val open: Boolean
+trait Door extends Body {
   def safetyRecords: SafetyRecord = SafetyRecord(name, SafetyStatus.Green)
 }

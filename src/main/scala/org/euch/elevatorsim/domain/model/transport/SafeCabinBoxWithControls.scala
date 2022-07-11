@@ -15,17 +15,6 @@ class SafeCabinBoxWithControls(
     override val innerDimensions: DimensionsBox,
     override val loads: List[Load],
     override val buttonPane: ButtonPane,
-    val doors: List[Door],
+    override val doors: List[Door],
     override val defaultFloor: Option[String]
-) extends CabinBox(
-      name,
-      weight,
-      dimensions,
-      innerDimensions,
-      loads,
-      defaultFloor
-    )
-    with Controllable {
-  override def safetyRecords: List[SafetyRecord] = doors.map(_.safetyRecords)
-
-}
+) extends SafeTransport with Controllable 

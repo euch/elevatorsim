@@ -14,4 +14,4 @@ class Platform(
     override val weight: Double,
     override val loads: List[Load],
     override val defaultFloor: Option[String]
-) extends Transport {}
+) extends Transport

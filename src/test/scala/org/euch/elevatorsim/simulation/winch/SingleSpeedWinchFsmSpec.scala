@@ -37,12 +37,12 @@ class SingleSpeedWinchFsmSpec
         probe.expectMessage(0)
       }
 
-      { // This type of winch does not reverse without 'Stop' command
+      { // This type of winch is reversible without 'Stop' command
         val now = Instant.now()
         winchActor ! WinchCommand.MoveCommand.GoDown(now)
         winchActor ! WinchCommand.MoveCommand.GoUp(now)
         winchActor ! WinchCommand.GetSpeed(now, probe.ref)
-        probe.expectMessage(2)
+        probe.expectMessage(1)
       }
 
       { // Check reverse with 'Stop' command
