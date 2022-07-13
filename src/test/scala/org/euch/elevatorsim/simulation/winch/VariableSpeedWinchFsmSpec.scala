@@ -1,10 +1,6 @@
 package org.euch.elevatorsim.simulation.winch
 
-import akka.actor.testkit.typed.scaladsl.{
-  LogCapturing,
-  ScalaTestWithActorTestKit,
-  TestProbe
-}
+import akka.actor.testkit.typed.scaladsl.{LogCapturing, ScalaTestWithActorTestKit, TestProbe}
 import org.euch.elevatorsim.domain.model.Direction
 import org.euch.elevatorsim.domain.model.dimensions.DimensionsRectangle
 import org.euch.elevatorsim.domain.model.winch.*
@@ -102,7 +98,7 @@ class VariableSpeedWinchFsmSpec
         val speed: Double = probe.receiveMessage(20.millis)
         assert(abs(speed) < runawaySpeed)
         if (abs(speed) < abs(targetSpeed)) {
-           println(s"speedUp: $speed -> $targetSpeed")
+          // println(s"speedUp: $speed -> $targetSpeed")
           waitForSpeedUp(targetSpeed)
         } else {
           println(s"speed increased target reached: $speed -> $targetSpeed")
@@ -116,7 +112,7 @@ class VariableSpeedWinchFsmSpec
         val speed: Double = probe.receiveMessage(20.millis)
         assert(abs(speed) < runawaySpeed)
         if (abs(speed) > abs(targetSpeed)) {
-           println(s"slowDown: $speed -> $targetSpeed")
+          // println(s"slowDown: $speed -> $targetSpeed")
           waitForSlowDown(targetSpeed)
         } else {
           println(s"speed reduced target reached: $speed -> $targetSpeed")

@@ -4,8 +4,8 @@ import org.euch.elevatorsim.domain.model.body.BoxBody
 import org.euch.elevatorsim.domain.model.dimensions.DimensionsBox
 import org.euch.elevatorsim.domain.model.loads.*
 import org.euch.elevatorsim.domain.model.transport.CabinBox
-import org.euch.elevatorsim.simulation.model.fitting.weight.FitByWeightRejectHeavy
 import org.euch.elevatorsim.simulation.model.fitting.FitResult
+import org.euch.elevatorsim.simulation.model.fitting.weight.FitByWeightRejectHeavy
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

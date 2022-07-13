@@ -2,6 +2,7 @@ package org.euch.elevatorsim.simulation.door
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import org.euch.elevatorsim.InstantUtils
 import org.euch.elevatorsim.Log.log
 import org.euch.elevatorsim.domain.model.Direction
 import org.euch.elevatorsim.domain.model.doors.{Door, PoweredDoor}
@@ -10,44 +11,49 @@ import java.time.Instant
 import scala.concurrent.duration.*
 
 sealed trait DoorState {
-  val t0percent: OpenPercentAtTime
   val door: Door
   def openPercent(now: Instant): Double
 }
 
 object DoorState {
+
   case class Closed(
-      override val t0percent: OpenPercentAtTime,
       override val door: Door
   ) extends DoorState {
     override def openPercent(now: Instant): Double = 0
   }
+
   case class Opening(
-      override val t0percent: OpenPercentAtTime,
+      t0percent: OpenPercentAtTime,
       override val door: Door,
       closeTimeoutSeconds: Option[Long]
   ) extends DoorState {
-    override def openPercent(now: Instant): Double = ???
+    override def openPercent(now: Instant): Double = door match
+      case poweredDoor: PoweredDoor =>
+        val duration = InstantUtils.diffSeconds(now, t0percent.instant)
+        val p = duration * poweredDoor.openSpeedPPS
+        math.min(p, 100)
+      case _ => 100
   }
 
   case class Open(
-                   override val t0percent: OpenPercentAtTime,
-                   override val door: Door,
-                   stayOpenSecondsOptional: Option[Long]
-                 ) extends DoorState {
+      opened: Instant,
+      override val door: Door,
+      stayOpenSecondsOptional: Option[Long]
+  ) extends DoorState {
     override def openPercent(now: Instant): Double = 100
   }
+
   case class Closing(
-      override val t0percent: OpenPercentAtTime,
+      t0percent: OpenPercentAtTime,
       override val door: Door
   ) extends DoorState {
-    override def openPercent(now: Instant): Double = ???
-  }
-  case class Stuck(
-      override val t0percent: OpenPercentAtTime,
-      override val door: Door
-  ) extends DoorState {
-    override def openPercent(now: Instant): Double = ???
+    override def openPercent(now: Instant): Double = door match
+      case poweredDoor: PoweredDoor =>
+        val duration = InstantUtils.diffSeconds(now, t0percent.instant)
+        val p = 100 - duration * poweredDoor.closeSpeedPPS
+        math.max(0, p)
+      case _ => 0
   }
 }
 
