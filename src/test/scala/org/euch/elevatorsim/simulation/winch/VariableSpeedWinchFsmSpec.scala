@@ -94,7 +94,7 @@ class VariableSpeedWinchFsmSpec
       def waitForSpeedUp(targetSpeed: Double): Unit = {
         val now = Instant.now()
         winchActor ! WinchCommand.GetSpeed(now, probe.ref)
-        val speed: Double = probe.receiveMessage(20.millis)
+        val speed: Double = probe.receiveMessage(50.millis)
         assert(abs(speed) < runawaySpeed)
         if (abs(speed) < abs(targetSpeed)) {
           // println(s"speedUp: $speed -> $targetSpeed")
@@ -108,7 +108,7 @@ class VariableSpeedWinchFsmSpec
       def waitForSlowDown(targetSpeed: Double): Unit = {
         val now = Instant.now()
         winchActor ! WinchCommand.GetSpeed(now, probe.ref)
-        val speed: Double = probe.receiveMessage(20.millis)
+        val speed: Double = probe.receiveMessage(50.millis)
         assert(abs(speed) < runawaySpeed)
         if (abs(speed) > abs(targetSpeed)) {
           // println(s"slowDown: $speed -> $targetSpeed")
