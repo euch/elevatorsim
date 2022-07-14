@@ -1,13 +1,10 @@
 package org.euch.elevatorsim.simulation.orders
 
-import org.euch.elevatorsim.domain.model.dimensions.DimensionsBox
-import org.euch.elevatorsim.domain.model.loads.{LoadGroup, Passenger}
-import org.euch.elevatorsim.domain.model.transport.CabinBox
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-class OrdersSpec extends AnyFlatSpec with Matchers {
-  private val orders = new Orders()
+class BaseOrderKeeperSpec extends AnyFlatSpec with Matchers {
+  private val orders = new BaseOrderKeeper()
   private val allDirections =
     List(OrderDirection.Any, OrderDirection.Up, OrderDirection.Down)
   private val fullRange = Range(Integer.MIN_VALUE, Integer.MAX_VALUE)

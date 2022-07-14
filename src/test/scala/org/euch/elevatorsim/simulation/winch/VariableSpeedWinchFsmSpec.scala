@@ -1,6 +1,10 @@
 package org.euch.elevatorsim.simulation.winch
 
-import akka.actor.testkit.typed.scaladsl.{LogCapturing, ScalaTestWithActorTestKit, TestProbe}
+import akka.actor.testkit.typed.scaladsl.{
+  LogCapturing,
+  ScalaTestWithActorTestKit,
+  TestProbe
+}
 import org.euch.elevatorsim.domain.model.Direction
 import org.euch.elevatorsim.domain.model.dimensions.DimensionsRectangle
 import org.euch.elevatorsim.domain.model.winch.*

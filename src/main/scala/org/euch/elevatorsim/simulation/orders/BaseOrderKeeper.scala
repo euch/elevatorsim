@@ -3,12 +3,12 @@ package org.euch.elevatorsim.simulation.orders
 import org.euch.elevatorsim.simulation.orders.OrderDirection
 
 import java.time.Instant
-
-class Orders() {
+class BaseOrderKeeper() extends OrderKeeper {
 
   private var orders = Set.empty[Order]
+  private val maxRange = Range(Integer.MIN_VALUE, Integer.MAX_VALUE)
 
-  def setOrder(
+  override def setOrder(
       floorNum: Int,
       wantedDirection: OrderDirection = OrderDirection.Any
   ): Boolean = {
@@ -17,7 +17,7 @@ class Orders() {
     orders.contains(order)
   }
 
-  def removeOrder(
+  override def removeOrder(
       floorNum: Int,
       directionFilter: OrderDirection = OrderDirection.Any
   ): Boolean = {
@@ -29,9 +29,9 @@ class Orders() {
     orders.size < sizeBefore
   }
 
-  def getOrders(
+  override def getOrders(
       directionFilter: OrderDirection,
-      floorRange: Range = Range(Integer.MIN_VALUE, Integer.MAX_VALUE)
+      floorRange: Range = maxRange
   ): List[Order] = orders
     .filter(o => {
       floorRange.contains(o.floorNum) &&

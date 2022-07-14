@@ -14,7 +14,11 @@ trait DoorCommand {
   val now: Instant
 }
 object DoorCommand {
-  case class Open(override val now: Instant, closeTimeoutSeconds: Option[Long]) extends DoorCommand
+  case class Open(override val now: Instant, closeTimeoutSeconds: Option[Long])
+      extends DoorCommand
   case class Close(override val now: Instant) extends DoorCommand
-  case class GetOpenPercent(override val now: Instant, replyTo: ActorRef[Double]) extends DoorCommand
+  case class GetOpenPercent(
+      override val now: Instant,
+      replyTo: ActorRef[Double]
+  ) extends DoorCommand
 }

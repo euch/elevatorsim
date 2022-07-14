@@ -7,9 +7,9 @@ import org.euch.elevatorsim.domain.model.transport.Transport
 import org.euch.elevatorsim.domain.model.winch.Winch
 
 case class BaseShaft(
-                      override val floors: List[Floor],
-                      override val name: String,
-                      override val dimensions: DimensionsBox,
-                      override val transport: Transport,
-                      override val winch: Winch
-) extends Shaft 
+    override val floors: List[Floor],
+    override val name: String,
+    override val dimensions: DimensionsBox,
+    override val transport: Transport,
+    override val winch: Winch
+) extends Shaft

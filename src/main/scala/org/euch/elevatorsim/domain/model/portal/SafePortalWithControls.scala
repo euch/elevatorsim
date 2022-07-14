@@ -1,8 +1,8 @@
 package org.euch.elevatorsim.domain.model.portal
 
+import org.euch.elevatorsim.domain.model.Controllable
 import org.euch.elevatorsim.domain.model.controls.ButtonPane
 import org.euch.elevatorsim.domain.model.doors.Door
-import org.euch.elevatorsim.domain.model.Controllable
 
 case class SafePortalWithControls(
     override val floorLevelZ: Double,
@@ -10,4 +10,4 @@ case class SafePortalWithControls(
     shaftDoors: List[Door],
     override val buttonPane: ButtonPane
 ) extends Portal
-    with Controllable 
+    with Controllable
