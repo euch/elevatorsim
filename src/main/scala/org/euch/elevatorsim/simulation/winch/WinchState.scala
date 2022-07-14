@@ -45,7 +45,6 @@ protected object WinchState {
             // accelerates immediately
             case w: SingleSpeedWinch =>
               w.getNominalSpeed(direction)
-            // v = v0 + a * t
             case w: VariableSpeedWinch =>
               val t = diffSeconds(now, t0v0.instant)
               val a = direction match {
@@ -68,7 +67,6 @@ protected object WinchState {
           winch match {
             // decelerates immediately
             case _: SingleSpeedWinch => 0
-            // v = v0 + a * t
             case w: VariableSpeedWinch =>
               val t = diffSeconds(now, t0v0.instant)
               val a = direction match {
