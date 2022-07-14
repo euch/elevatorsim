@@ -1,4 +1,4 @@
-package org.euch.elevatorsim.simulation.orders
+package org.euch.elevatorsim.simulation.order
 
 import java.time.Instant
 

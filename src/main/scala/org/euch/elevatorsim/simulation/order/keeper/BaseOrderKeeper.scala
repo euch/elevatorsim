@@ -1,16 +1,18 @@
-package org.euch.elevatorsim.simulation.orders
+package org.euch.elevatorsim.simulation.order.keeper
 
-import org.euch.elevatorsim.simulation.orders.OrderDirection
+import org.euch.elevatorsim.simulation.order.keeper.OrderKeeper
+import org.euch.elevatorsim.simulation.order.{Order, OrderDirection}
 
 import java.time.Instant
+
 class BaseOrderKeeper() extends OrderKeeper {
 
   private var orders = Set.empty[Order]
   private val maxRange = Range(Integer.MIN_VALUE, Integer.MAX_VALUE)
 
   override def setOrder(
-      floorNum: Int,
-      wantedDirection: OrderDirection = OrderDirection.Any
+                         floorNum: Int,
+                         wantedDirection: OrderDirection = OrderDirection.Any
   ): Boolean = {
     val order = Order(floorNum, wantedDirection, Instant.now())
     orders = orders ++ Set(order)

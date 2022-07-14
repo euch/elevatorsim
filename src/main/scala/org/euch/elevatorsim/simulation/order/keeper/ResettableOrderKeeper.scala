@@ -1,6 +1,6 @@
-package org.euch.elevatorsim.simulation.orders
+package org.euch.elevatorsim.simulation.order.keeper
 
-import org.euch.elevatorsim.simulation.orders.OrderDirection
+import org.euch.elevatorsim.simulation.order.{Order, OrderDirection}
 
 import java.time.Instant
 
