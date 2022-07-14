@@ -56,7 +56,7 @@ class PoweredDoorActorFsmSpec
       def waitForOpen(targetPercentage: Double): Unit = {
         val now = Instant.now()
         doorActor ! DoorCommand.GetOpenPercent(now, probe.ref)
-        val percentage: Double = probe.receiveMessage(20.millis)
+        val percentage: Double = probe.receiveMessage(50.millis)
         assert(percentage >= openRange._1)
         assert(percentage <= openRange._2)
         if (percentage < targetPercentage) {
@@ -71,7 +71,7 @@ class PoweredDoorActorFsmSpec
       def waitForClose(targetPercentage: Double): Unit = {
         val now = Instant.now()
         doorActor ! DoorCommand.GetOpenPercent(now, probe.ref)
-        val percentage: Double = probe.receiveMessage(20.millis)
+        val percentage: Double = probe.receiveMessage(50.millis)
         assert(percentage >= openRange._1)
         assert(percentage <= openRange._2)
         if (percentage > targetPercentage) {
