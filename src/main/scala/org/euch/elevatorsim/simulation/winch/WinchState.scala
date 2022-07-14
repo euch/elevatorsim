@@ -1,12 +1,7 @@
 package org.euch.elevatorsim.simulation.winch
 
 import org.euch.elevatorsim.InstantUtils.diffSeconds
-import org.euch.elevatorsim.domain.model.Direction
-import org.euch.elevatorsim.domain.model.winch.{
-  SingleSpeedWinch,
-  VariableSpeedWinch,
-  Winch
-}
+import org.euch.elevatorsim.domain.model.winch.{SingleSpeedWinch, VariableSpeedWinch, Winch}
 
 import java.time.Instant
 
@@ -21,15 +16,15 @@ protected object WinchState {
   }
 
   trait Moving extends WinchState {
-    val direction: Direction
+    val direction: WinchDirection
   }
 
   object Moving {
     object LinearMoving {
       case class Run(
-          override val direction: Direction,
-          override val winch: Winch
-      ) extends WinchState.Moving {
+                      override val direction: WinchDirection,
+                      override val winch: Winch
+                    ) extends WinchState.Moving {
         override def speed(now: Instant): Double =
           winch.getNominalSpeed(direction)
       }
@@ -41,10 +36,10 @@ protected object WinchState {
 
     object NonLinearMoving {
       case class SpeedUp(
-          override val direction: Direction,
-          override val t0v0: SpeedAtTime,
-          override val winch: Winch
-      ) extends NonLinearMoving {
+                          override val direction: WinchDirection,
+                          override val t0v0: SpeedAtTime,
+                          override val winch: Winch
+                        ) extends NonLinearMoving {
         override def speed(now: Instant): Double = {
           winch match {
             // accelerates immediately
@@ -53,7 +48,11 @@ protected object WinchState {
             // v = v0 + a * t
             case w: VariableSpeedWinch =>
               val t = diffSeconds(now, t0v0.instant)
-              t0v0.speed + w.speedUpAccelerations.get(direction) * t
+              val a = direction match {
+                case WinchDirection.Up => w.speedUpAccelerations.upwards
+                case WinchDirection.Down => w.speedUpAccelerations.downwards
+              }
+              t0v0.speed + a * t
             case _ =>
               throw new java.lang.Exception("winch type not supported")
           }
@@ -61,10 +60,10 @@ protected object WinchState {
       }
 
       case class SlowDown(
-          override val direction: Direction,
-          override val t0v0: SpeedAtTime,
-          override val winch: Winch
-      ) extends WinchState.Moving.NonLinearMoving {
+                           override val direction: WinchDirection,
+                           override val t0v0: SpeedAtTime,
+                           override val winch: Winch
+                         ) extends WinchState.Moving.NonLinearMoving {
         override def speed(now: Instant): Double = {
           winch match {
             // decelerates immediately
@@ -72,7 +71,15 @@ protected object WinchState {
             // v = v0 + a * t
             case w: VariableSpeedWinch =>
               val t = diffSeconds(now, t0v0.instant)
-              t0v0.speed + w.slowDownAccelerations.get(direction) * t
+              val a = direction match {
+                case WinchDirection.Up => w.slowDownAccelerations.upwards
+                case WinchDirection.Down => w.slowDownAccelerations.downwards
+              }
+              val speed = t0v0.speed + a * t
+              direction match {
+                case WinchDirection.Up => math.max(0, speed)
+                case WinchDirection.Down => math.min(0, speed)
+              }
             case _ =>
               throw new java.lang.Exception("winch type not supported")
           }

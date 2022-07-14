@@ -1,7 +1,7 @@
 package org.euch.elevatorsim.domain.model.winch
 
-import org.euch.elevatorsim.domain.model.Direction
 import org.euch.elevatorsim.domain.model.dimensions.Dimensions
+import org.euch.elevatorsim.simulation.winch.WinchDirection
 
 case class VariableSpeedWinch(
     override val nominalSpeedUp: Double,
@@ -13,8 +13,4 @@ case class VariableSpeedWinch(
     slowDownAccelerations: VerticalAccelerations
 ) extends Winch
 
-case class VerticalAccelerations(upwards: Double, downwards: Double) {
-  def get(direction: Direction): Double = direction match
-    case Direction.Up   => upwards
-    case Direction.Down => downwards
-}
+case class VerticalAccelerations(upwards: Double, downwards: Double)

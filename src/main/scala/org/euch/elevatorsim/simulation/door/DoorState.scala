@@ -4,8 +4,8 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import org.euch.elevatorsim.InstantUtils
 import org.euch.elevatorsim.Log.log
-import org.euch.elevatorsim.domain.model.Direction
 import org.euch.elevatorsim.domain.model.doors.{Door, PoweredDoor}
+import org.euch.elevatorsim.simulation.winch.WinchDirection
 
 import java.time.Instant
 import scala.concurrent.duration.*
