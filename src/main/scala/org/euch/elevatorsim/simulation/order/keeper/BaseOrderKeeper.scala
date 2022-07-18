@@ -1,7 +1,7 @@
 package org.euch.elevatorsim.simulation.order.keeper
 
+import org.euch.elevatorsim.simulation.order.keeper
 import org.euch.elevatorsim.simulation.order.keeper.OrderKeeper
-import org.euch.elevatorsim.simulation.order.{Order, OrderDirection}
 
 import java.time.Instant
 
@@ -14,7 +14,7 @@ class BaseOrderKeeper() extends OrderKeeper {
                          floorNum: Int,
                          wantedDirection: OrderDirection = OrderDirection.Any
   ): Boolean = {
-    val order = Order(floorNum, wantedDirection, Instant.now())
+    val order = keeper.Order(floorNum, wantedDirection, Instant.now())
     orders = orders ++ Set(order)
     orders.contains(order)
   }

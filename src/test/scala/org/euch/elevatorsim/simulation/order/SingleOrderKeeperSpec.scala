@@ -1,6 +1,6 @@
 package org.euch.elevatorsim.simulation.order
 
-import org.euch.elevatorsim.simulation.order.keeper.SingleOrderKeeper
+import org.euch.elevatorsim.simulation.order.keeper.{OrderDirection, SingleOrderKeeper}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

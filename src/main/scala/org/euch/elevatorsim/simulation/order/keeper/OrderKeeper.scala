@@ -1,7 +1,5 @@
 package org.euch.elevatorsim.simulation.order.keeper
 
-import org.euch.elevatorsim.simulation.order.{Order, OrderDirection}
-
 trait OrderKeeper {
   def setOrder(
                 floorNum: Int,

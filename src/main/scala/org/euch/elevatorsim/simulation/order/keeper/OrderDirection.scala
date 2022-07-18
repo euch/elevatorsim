@@ -1,4 +1,6 @@
-package org.euch.elevatorsim.simulation.order
+package org.euch.elevatorsim.simulation.order.keeper
+
+import org.euch.elevatorsim.simulation.order.keeper.OrderDirection
 
 trait OrderDirection {
   def compatible(orderDirection: OrderDirection): Boolean = {
