@@ -1,10 +1,6 @@
 package org.euch.elevatorsim.simulation.winch
 
-import akka.actor.testkit.typed.scaladsl.{
-  LogCapturing,
-  ScalaTestWithActorTestKit,
-  TestProbe
-}
+import akka.actor.testkit.typed.scaladsl.{LogCapturing, ScalaTestWithActorTestKit, TestProbe}
 import org.euch.elevatorsim.domain.model.dimensions.DimensionsRectangle
 import org.euch.elevatorsim.domain.model.winch.*
 import org.euch.elevatorsim.simulation.winch.{WinchActor, WinchCommand}
@@ -21,7 +17,13 @@ class SingleSpeedWinchFsmSpec
   "SingleSpeedWinchFsmSpec" must {
     "work" in {
       val winch =
-        SingleSpeedWinch(1, 2, 50, "Winch", DimensionsRectangle(50, 50))
+        SingleSpeedWinch(
+          nominalSpeedUp = 1,
+          nominalSpeedDown = -2,
+          weight = 50,
+          name = "Winch",
+          dimensions = DimensionsRectangle(50, 50)
+        )
       val winchActor = spawn(WinchActor(winch))
       val probe = TestProbe[Double]()
       winchActor ! WinchCommand.GetSpeed(Instant.now(), probe.ref)
@@ -41,12 +43,12 @@ class SingleSpeedWinchFsmSpec
         probe.expectMessage(0)
       }
 
-      { // This type of winch is reversible without 'Stop' command
+      { // Not reversible without 'Stop' command
         val now = Instant.now()
         winchActor ! WinchCommand.MoveCommand.GoDown(now)
         winchActor ! WinchCommand.MoveCommand.GoUp(now)
         winchActor ! WinchCommand.GetSpeed(now, probe.ref)
-        probe.expectMessage(1)
+        probe.expectMessage(-2)
       }
 
       { // Check reverse with 'Stop' command
