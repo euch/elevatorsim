@@ -15,7 +15,7 @@ class LoadActor {
     waiting(LoadState.Waiting(loadGroup))
 
   private def waiting(state: LoadState.Waiting): Behavior[LoadCommand] = {
-    log.info(s"closed state: $state")
+    log.info(s"waiting state: $state")
     Behaviors.receiveMessagePartial[LoadCommand] {
       case LoadCommand.Load(now) =>
         log.info(s"${state.loadGroup.name} waiting -> loading")
@@ -37,7 +37,7 @@ class LoadActor {
         LoadCommand.Tick(Instant.now).asInstanceOf[LoadCommand],
         10.millis
       )
-      log.info(s"opening state: $state")
+      log.info(s"loading state: $state")
       Behaviors.receiveMessagePartial[LoadCommand] {
         case LoadCommand.Tick(now) if state.loaded(now) =>
           log.info(s"${state.loadGroup.name} loading -> traveling")
@@ -64,7 +64,7 @@ class LoadActor {
   private def traveling(state: LoadState.Traveling): Behavior[LoadCommand] = {
     Behaviors.withTimers[LoadCommand] { timers =>
       timers.startSingleTimer(LoadCommand.Tick(Instant.now), 10.millis)
-      log.info(s"open state: $state")
+      log.info(s"traveling state: $state")
       Behaviors.receiveMessagePartial[LoadCommand] {
         case LoadCommand.GetLoadPercent(now, replyTo) =>
           replyTo ! state.loadPercent(now)
@@ -84,7 +84,7 @@ class LoadActor {
   private def unloading(state: LoadState.Unloading): Behavior[LoadCommand] = {
     Behaviors.withTimers[LoadCommand] { timers =>
       timers.startSingleTimer(LoadCommand.Tick(Instant.now), 10.millis)
-      log.info(s"closing state: $state")
+      log.info(s"unloading state: $state")
       Behaviors.receiveMessagePartial[LoadCommand] {
         case LoadCommand.Tick(now) if state.unloaded(now) =>
           log.info(s"${state.loadGroup.name} unloading -> [actor stop]")

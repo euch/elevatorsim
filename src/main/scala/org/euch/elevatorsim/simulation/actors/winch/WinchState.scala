@@ -1,11 +1,11 @@
 package org.euch.elevatorsim.simulation.actors.winch
 
-import org.euch.elevatorsim.InstantUtils.diffSeconds
+import org.euch.elevatorsim.InstantUtils.*
 import org.euch.elevatorsim.Log.log
+import org.euch.elevatorsim.PercentUtils.*
 import org.euch.elevatorsim.domain.model.winch.{SingleSpeedWinch, VariableSpeedWinch, Winch}
 
 import java.time.Instant
-import scala.math
 import scala.math.{max, min}
 
 protected sealed trait WinchState {
@@ -16,7 +16,7 @@ protected sealed trait WinchState {
 
 protected object WinchState {
   case class Stopped(override val winch: Winch) extends WinchState {
-    override def speed(now: Instant): Double = 0
+    override def speed(now: Instant): Double = p0
   }
 
   trait Moving extends WinchState {
@@ -55,17 +55,17 @@ protected object WinchState {
             // accelerates immediately
             case _: SingleSpeedWinch => super.nominalSpeed
             case w: VariableSpeedWinch =>
-              val t = diffSeconds(now, t0v0.instant)
+              val durationSeconds = diffSeconds(now, t0v0.instant)
               direction match {
                 case WinchDirection.Up =>
                   min(
                     w.nominalSpeedUp,
-                    t0v0.speed + w.speedUpAccelerations.upwards * t
+                    t0v0.speed + w.speedUpAccelerations.upwards * durationSeconds
                   )
                 case WinchDirection.Down =>
                   max(
                     w.nominalSpeedDown,
-                    t0v0.speed + w.speedUpAccelerations.downwards * t
+                    t0v0.speed + w.speedUpAccelerations.downwards * durationSeconds
                   )
               }
             case _ =>
@@ -85,14 +85,14 @@ protected object WinchState {
         override def speed(now: Instant): Double = {
           winch match {
             // decelerates immediately
-            case _: SingleSpeedWinch => 0
+            case _: SingleSpeedWinch => p0
             case w: VariableSpeedWinch =>
               val t = diffSeconds(now, t0v0.instant)
               val speed = direction match {
                 case WinchDirection.Up =>
-                  max(0, t0v0.speed + w.slowDownAccelerations.upwards * t)
+                  max(p0, t0v0.speed + w.slowDownAccelerations.upwards * t)
                 case WinchDirection.Down =>
-                  min(0, t0v0.speed + w.slowDownAccelerations.downwards * t)
+                  min(p0, t0v0.speed + w.slowDownAccelerations.downwards * t)
               }
               log.info(s"slowdown speed = $speed")
               speed
@@ -101,7 +101,8 @@ protected object WinchState {
           }
         }
 
-        override def targetSpeedReached(now: Instant): Boolean = speed(now) == 0
+        override def targetSpeedReached(now: Instant): Boolean =
+          speed(now) == p0
       }
     }
   }

@@ -3,6 +3,7 @@ package org.euch.elevatorsim.simulation.actors.winch
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import org.euch.elevatorsim.Log.log
+import org.euch.elevatorsim.PercentUtils.p0
 import org.euch.elevatorsim.domain.model.winch.*
 import org.euch.elevatorsim.simulation.actors.winch.*
 
@@ -23,7 +24,7 @@ object WinchActor {
         speedUp(
           WinchState.Moving.NonLinearMoving.SpeedUp(
             t.direction,
-            SpeedAtTime(t.now, 0),
+            SpeedAtTime(t.now, state.speed(t.now)),
             state.winch
           )
         )

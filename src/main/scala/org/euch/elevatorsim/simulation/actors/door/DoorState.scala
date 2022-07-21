@@ -2,8 +2,9 @@ package org.euch.elevatorsim.simulation.actors.door
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
-import org.euch.elevatorsim.InstantUtils
+import org.euch.elevatorsim.InstantUtils.*
 import org.euch.elevatorsim.Log.log
+import org.euch.elevatorsim.PercentUtils.*
 import org.euch.elevatorsim.domain.model.doors.{Door, PoweredDoor}
 import org.euch.elevatorsim.simulation.actors.winch.WinchDirection
 
@@ -20,7 +21,7 @@ object DoorState {
   case class Closed(
       override val door: Door
   ) extends DoorState {
-    override def openPercent(now: Instant): Double = 0
+    override def openPercent(now: Instant): Double = p0
 
   }
 
@@ -31,11 +32,12 @@ object DoorState {
   ) extends DoorState {
     override def openPercent(now: Instant): Double = door match
       case poweredDoor: PoweredDoor =>
-        val duration = InstantUtils.diffSeconds(now, t0percent.instant)
-        val p = duration * poweredDoor.openSpeedPPS
-        math.min(p, 100)
-      case _ => 100
-    def fullyOpened(now: Instant): Boolean = openPercent(now) == 100
+        travelPercentageLTE100(
+          diffSeconds(now, t0percent.instant),
+          poweredDoor.openSpeedPPS
+        )
+      case _ => p100
+    def fullyOpened(now: Instant): Boolean = openPercent(now) == p100
   }
 
   case class Open(
@@ -43,7 +45,7 @@ object DoorState {
       override val door: Door,
       stayOpenSecondsOptional: Option[Long]
   ) extends DoorState {
-    override def openPercent(now: Instant): Double = 100
+    override def openPercent(now: Instant): Double = p100
   }
 
   case class Closing(
@@ -52,11 +54,12 @@ object DoorState {
   ) extends DoorState {
     override def openPercent(now: Instant): Double = door match
       case poweredDoor: PoweredDoor =>
-        val duration = InstantUtils.diffSeconds(now, t0percent.instant)
-        val p = 100 - duration * poweredDoor.closeSpeedPPS
-        math.max(0, p)
-      case _ => 0
-    def fullyClosed(now: Instant): Boolean = openPercent(now) == 0
+        travelPercentageGTE0(
+          diffSeconds(now, t0percent.instant),
+          poweredDoor.closeSpeedPPS
+        )
+      case _ => p0
+    def fullyClosed(now: Instant): Boolean = openPercent(now) == p0
   }
 }
 

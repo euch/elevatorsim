@@ -3,7 +3,9 @@ package org.euch.elevatorsim.simulation.actors.load
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import org.euch.elevatorsim.InstantUtils
+import org.euch.elevatorsim.InstantUtils.*
 import org.euch.elevatorsim.Log.log
+import org.euch.elevatorsim.PercentUtils.*
 import org.euch.elevatorsim.domain.model.loads.LoadGroup
 import org.euch.elevatorsim.simulation.actors.door.OpenPercentAtTime
 import org.euch.elevatorsim.simulation.actors.winch.WinchDirection
@@ -20,7 +22,7 @@ object LoadState {
   case class Waiting(
       override val loadGroup: LoadGroup
   ) extends LoadState {
-    override def loadPercent(now: Instant): Double = 0
+    override def loadPercent(now: Instant): Double = p0
   }
 
   case class Loading(
@@ -30,13 +32,13 @@ object LoadState {
     override def loadPercent(now: Instant): Double = {
       val duration = InstantUtils.diffSeconds(now, t0percent.instant)
       val p = duration * loadGroup.loadSpeedPPS
-      math.min(p, 100)
+      math.min(p, p100)
     }
-    def loaded(now: Instant): Boolean = loadPercent(now) == 100
+    def loaded(now: Instant): Boolean = loadPercent(now) == p100
   }
 
   case class Traveling(override val loadGroup: LoadGroup) extends LoadState {
-    override def loadPercent(now: Instant): Double = 100
+    override def loadPercent(now: Instant): Double = p100
   }
 
   case class Unloading(
@@ -46,9 +48,9 @@ object LoadState {
     override def loadPercent(now: Instant): Double = {
       val duration = InstantUtils.diffSeconds(now, t0percent.instant)
       val p = duration * loadGroup.unloadSpeedPPS
-      math.max(0, p)
+      math.max(p0, p)
     }
-    def unloaded(now: Instant): Boolean = loadPercent(now) == 0
+    def unloaded(now: Instant): Boolean = loadPercent(now) == p0
   }
 
 }
