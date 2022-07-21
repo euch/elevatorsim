@@ -5,7 +5,7 @@ import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import org.euch.elevatorsim.InstantUtils
 import org.euch.elevatorsim.InstantUtils.*
 import org.euch.elevatorsim.Log.log
-import org.euch.elevatorsim.PercentUtils.*
+import org.euch.elevatorsim.PercentUtils.{p0, p100, travelPercentageGTE0, travelPercentageLTE100}
 import org.euch.elevatorsim.domain.model.loads.LoadGroup
 import org.euch.elevatorsim.simulation.actors.door.OpenPercentAtTime
 import org.euch.elevatorsim.simulation.actors.winch.WinchDirection
@@ -29,11 +29,10 @@ object LoadState {
       override val loadGroup: LoadGroup,
       t0percent: LoadPercentAtTime
   ) extends LoadState {
-    override def loadPercent(now: Instant): Double = {
-      val duration = InstantUtils.diffSeconds(now, t0percent.instant)
-      val p = duration * loadGroup.loadSpeedPPS
-      math.min(p, p100)
-    }
+    override def loadPercent(now: Instant): Double = travelPercentageLTE100(
+      diffSeconds(now, t0percent.instant),
+      loadGroup.loadSpeedPPS
+    )
     def loaded(now: Instant): Boolean = loadPercent(now) == p100
   }
 
@@ -45,11 +44,10 @@ object LoadState {
       override val loadGroup: LoadGroup,
       t0percent: LoadPercentAtTime
   ) extends LoadState {
-    override def loadPercent(now: Instant): Double = {
-      val duration = InstantUtils.diffSeconds(now, t0percent.instant)
-      val p = duration * loadGroup.unloadSpeedPPS
-      math.max(p0, p)
-    }
+    override def loadPercent(now: Instant): Double = travelPercentageGTE0(
+      diffSeconds(now, t0percent.instant),
+      loadGroup.unloadSpeedPPS
+    )
     def unloaded(now: Instant): Boolean = loadPercent(now) == p0
   }
 

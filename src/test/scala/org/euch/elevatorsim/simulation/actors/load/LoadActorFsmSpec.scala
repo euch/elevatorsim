@@ -1,11 +1,9 @@
-package org.euch.elevatorsim.simulation.actors.door
+package org.euch.elevatorsim.simulation.actors.load
 
 import akka.actor.testkit.typed.scaladsl.{LogCapturing, ScalaTestWithActorTestKit, TestProbe}
-import org.euch.elevatorsim.domain.model.dimensions.DimensionsRectangle
-import org.euch.elevatorsim.domain.model.doors.TwoLeafDoor
-import org.euch.elevatorsim.domain.model.winch.*
-import org.euch.elevatorsim.simulation.actors.door.{DoorActor, DoorCommand}
-import org.euch.elevatorsim.simulation.actors.winch.{WinchActor, WinchCommand}
+import org.euch.elevatorsim.domain.model.dimensions.{DimensionsBox, DimensionsRectangle}
+import org.euch.elevatorsim.domain.model.loads.{LoadGroup, Passenger}
+import org.euch.elevatorsim.simulation.actors.load.{LoadActor, LoadCommand}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.{AnyWordSpec, AnyWordSpecLike}
@@ -14,49 +12,47 @@ import java.time.Instant
 import scala.annotation.tailrec
 import scala.concurrent.duration.*
 
-class PoweredDoorActorFsmSpec
-    extends ScalaTestWithActorTestKit
-    with AnyWordSpecLike {
+class LoadActorFsmSpec extends ScalaTestWithActorTestKit with AnyWordSpecLike {
 
-  "PoweredDoorActorFsmSpec" must {
+  "LoadActorFsmSpec" must {
     "work" in {
+
       // no overshooting expected
       val openRange = (0, 100)
 
-      val door =
-        TwoLeafDoor(
-          "Door",
-          DimensionsRectangle(50, 50),
-          50,
-          openSpeedPPS = 50,
-          closeSpeedPPS = 30
-        )
-      val doorActor = spawn(DoorActor(door))
+      val loadGroup = LoadGroup(
+        "LoadGroup",
+        "1",
+        List(
+          Passenger(
+            name = "James",
+            dimensions = DimensionsBox(40, 60, 180),
+            weight = 100
+          )
+        ),
+        50,
+        50
+      )
+      val loadActor = spawn(LoadActor(loadGroup))
       val probe = TestProbe[Double]()
-      doorActor ! DoorCommand.GetOpenPercent(Instant.now(), probe.ref)
-      probe.expectMessage(0) // initial open percentage = 0
 
-      // ask to open
-      doorActor ! DoorCommand.Open(Instant.now(), Option.empty)
-      // wait
-      waitForOpen(100)
-      // should stay open
-      doorActor ! DoorCommand.GetOpenPercent(Instant.now(), probe.ref)
-      probe.expectMessage(100)
+      loadActor ! LoadCommand.GetLoadPercent(Instant.now(), probe.ref)
+      probe.expectMessage(0) // initial load percentage = 0
 
-      doorActor ! DoorCommand.Close(Instant.now())
-      waitForClose(50)
-      doorActor ! DoorCommand.Open(Instant.now(), Option.empty)
-      waitForOpen(70)
-      doorActor ! DoorCommand.Close(Instant.now())
+      loadActor ! LoadCommand.Load(Instant.now())
+      waitForOpen(100) // should be loaded
+      loadActor ! LoadCommand.GetLoadPercent(Instant.now(), probe.ref)
+      probe.expectMessage(100) // and stay 100 percent loaded
+
+      loadActor ! LoadCommand.Unload(Instant.now())
       waitForClose(0)
-      doorActor ! DoorCommand.GetOpenPercent(Instant.now(), probe.ref)
-      probe.expectMessage(0)
+      loadActor ! LoadCommand.GetLoadPercent(Instant.now(), probe.ref)
+      probe.expectNoMessage() // actor should stop
 
       @tailrec
       def waitForOpen(targetPercentage: Double): Unit = {
         val now = Instant.now()
-        doorActor ! DoorCommand.GetOpenPercent(now, probe.ref)
+        loadActor ! LoadCommand.GetLoadPercent(now, probe.ref)
         val percentage: Double = probe.receiveMessage(50.millis)
         assert(percentage >= openRange._1)
         assert(percentage <= openRange._2)
@@ -73,7 +69,7 @@ class PoweredDoorActorFsmSpec
       @tailrec
       def waitForClose(targetPercentage: Double): Unit = {
         val now = Instant.now()
-        doorActor ! DoorCommand.GetOpenPercent(now, probe.ref)
+        loadActor ! LoadCommand.GetLoadPercent(now, probe.ref)
         val percentage: Double = probe.receiveMessage(50.millis)
         assert(percentage >= openRange._1)
         assert(percentage <= openRange._2)

@@ -9,7 +9,7 @@ import org.euch.elevatorsim.simulation.actors.door.OpenPercentAtTime
 import java.time.Instant
 import scala.concurrent.duration.*
 
-class LoadActor {
+object LoadActor {
   // initial state
   def apply(loadGroup: LoadGroup): Behavior[LoadCommand] =
     waiting(LoadState.Waiting(loadGroup))
@@ -33,10 +33,7 @@ class LoadActor {
 
   private def loading(state: LoadState.Loading): Behavior[LoadCommand] = {
     Behaviors.withTimers[LoadCommand] { timers =>
-      timers.startSingleTimer(
-        LoadCommand.Tick(Instant.now).asInstanceOf[LoadCommand],
-        10.millis
-      )
+      timers.startSingleTimer(LoadCommand.Tick(Instant.now), 10.millis)
       log.info(s"loading state: $state")
       Behaviors.receiveMessagePartial[LoadCommand] {
         case LoadCommand.Tick(now) if state.loaded(now) =>
@@ -48,7 +45,15 @@ class LoadActor {
           )
         case LoadCommand.GetLoadPercent(now, replyTo) =>
           replyTo ! state.loadPercent(now)
-          Behaviors.unhandled
+          if (state.loaded(now)) {
+            traveling(
+              LoadState.Traveling(
+                state.loadGroup
+              )
+            )
+          } else {
+            Behaviors.unhandled
+          }
         case LoadCommand.Unload(now) =>
           log.info(s"${state.loadGroup.name} loading -> unloading")
           unloading(
@@ -62,22 +67,19 @@ class LoadActor {
   }
 
   private def traveling(state: LoadState.Traveling): Behavior[LoadCommand] = {
-    Behaviors.withTimers[LoadCommand] { timers =>
-      timers.startSingleTimer(LoadCommand.Tick(Instant.now), 10.millis)
-      log.info(s"traveling state: $state")
-      Behaviors.receiveMessagePartial[LoadCommand] {
-        case LoadCommand.GetLoadPercent(now, replyTo) =>
-          replyTo ! state.loadPercent(now)
-          Behaviors.unhandled
-        case LoadCommand.Unload(now) =>
-          log.info(s"${state.loadGroup.name} traveling -> unloading")
-          unloading(
-            LoadState.Unloading(
-              state.loadGroup,
-              LoadPercentAtTime(now, state.loadPercent(now))
-            )
+    log.info(s"traveling state: $state")
+    Behaviors.receiveMessagePartial[LoadCommand] {
+      case LoadCommand.GetLoadPercent(now, replyTo) =>
+        replyTo ! state.loadPercent(now)
+        Behaviors.unhandled
+      case LoadCommand.Unload(now) =>
+        log.info(s"${state.loadGroup.name} traveling -> unloading")
+        unloading(
+          LoadState.Unloading(
+            state.loadGroup,
+            LoadPercentAtTime(now, state.loadPercent(now))
           )
-      }
+        )
     }
   }
 
@@ -87,7 +89,7 @@ class LoadActor {
       log.info(s"unloading state: $state")
       Behaviors.receiveMessagePartial[LoadCommand] {
         case LoadCommand.Tick(now) if state.unloaded(now) =>
-          log.info(s"${state.loadGroup.name} unloading -> [actor stop]")
+          log.info(s"${state.loadGroup.name} unloading -> [actor stop 0]")
           Behaviors.stopped
         case LoadCommand.Load(now) =>
           log.info(s"${state.loadGroup.name} unloading -> loading")
@@ -99,7 +101,13 @@ class LoadActor {
           )
         case LoadCommand.GetLoadPercent(now, replyTo) =>
           replyTo ! state.loadPercent(now)
-          Behaviors.unhandled
+          if (state.unloaded(now)) {
+            log.info(s"${state.loadGroup.name} unloading -> [actor stop 1]")
+            Behaviors.stopped
+          } else {
+            Behaviors.unhandled
+
+          }
       }
     }
   }
