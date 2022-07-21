@@ -7,5 +7,4 @@ trait Winch extends Body {
   val nominalSpeedUp: Double
   val nominalSpeedDown: Double
 
-
 }

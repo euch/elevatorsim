@@ -11,8 +11,6 @@ import scala.concurrent.duration.*
 
 object WinchActor {
 
-  private case class Tick(now: Instant) extends WinchCommand
-
   // initial state
   def apply(winch: Winch): Behavior[WinchCommand] =
     idle(WinchState.Stopped(winch))
@@ -39,10 +37,10 @@ object WinchActor {
       state: WinchState.Moving.NonLinearMoving.SpeedUp
   ): Behavior[WinchCommand] = {
     Behaviors.withTimers[WinchCommand] { timers =>
-      timers.startSingleTimer(Tick(Instant.now), 10.millis)
+      timers.startSingleTimer(WinchCommand.Tick(Instant.now), 10.millis)
       log.info(s"speedup state: $state")
       Behaviors.receiveMessagePartial[WinchCommand] {
-        case Tick(now) if state.targetSpeedReached(now) =>
+        case WinchCommand.Tick(now) if state.targetSpeedReached(now) =>
           log.info(s"${state.winch.name} speedUp -> run")
           run(
             WinchState.Moving.LinearMoving.Run(
@@ -90,10 +88,10 @@ object WinchActor {
       state: WinchState.Moving.NonLinearMoving.SlowDown
   ): Behavior[WinchCommand] = {
     Behaviors.withTimers[WinchCommand] { timers =>
-      timers.startSingleTimer(Tick(Instant.now), 10.millis)
+      timers.startSingleTimer(WinchCommand.Tick(Instant.now), 10.millis)
       log.info(s"slowdown state: $state")
       Behaviors.receiveMessagePartial {
-        case Tick(now) if state.targetSpeedReached(now) =>
+        case WinchCommand.Tick(now) if state.targetSpeedReached(now) =>
           log.info(s"${state.winch.name} slowDown -> idle")
           idle(
             WinchState.Stopped(state.winch)

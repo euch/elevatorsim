@@ -27,7 +27,9 @@ class FitByWeightRejectHeavySpec extends AnyFlatSpec with Matchers {
         dimensions = DimensionsBox(30, 30, 180),
         weight = 100
       )
-    )
+    ),
+    50,
+    50
   )
   new FitByWeightRejectHeavy(200).fit(cabin, List(groupA)) shouldBe
     FitResult(fits = List(groupA), rejected = List.empty)
@@ -41,7 +43,9 @@ class FitByWeightRejectHeavySpec extends AnyFlatSpec with Matchers {
         dimensions = DimensionsBox(30, 30, 180),
         weight = 150
       )
-    )
+    ),
+    50,
+    50
   )
   private val groupC = LoadGroup(
     "GroupC",
@@ -52,7 +56,9 @@ class FitByWeightRejectHeavySpec extends AnyFlatSpec with Matchers {
         dimensions = DimensionsBox(30, 30, 180),
         weight = 100
       )
-    )
+    ),
+    50,
+    50
   )
   new FitByWeightRejectHeavy(300)
     .fit(cabin, List(groupA, groupB, groupC)) shouldBe

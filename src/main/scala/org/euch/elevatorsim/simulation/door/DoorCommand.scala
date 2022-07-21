@@ -1,13 +1,8 @@
 package org.euch.elevatorsim.simulation.door
 
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
-import org.euch.elevatorsim.Log.log
-import org.euch.elevatorsim.domain.model.winch.*
-import org.euch.elevatorsim.simulation.winch.*
+import akka.actor.typed.ActorRef
 
 import java.time.Instant
-import scala.concurrent.duration.*
 
 trait DoorCommand {
   val now: Instant
@@ -20,4 +15,5 @@ object DoorCommand {
       override val now: Instant,
       replyTo: ActorRef[Double]
   ) extends DoorCommand
+  case class Tick(override val now: Instant) extends DoorCommand
 }

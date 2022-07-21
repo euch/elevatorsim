@@ -22,5 +22,6 @@ object WinchCommand {
   case class Stop(override val now: Instant) extends WinchCommand
   case class GetSpeed(override val now: Instant, replyTo: ActorRef[Double])
       extends WinchCommand
+  case class Tick(now: Instant) extends WinchCommand
 
 }

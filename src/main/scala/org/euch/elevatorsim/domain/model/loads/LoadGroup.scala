@@ -5,7 +5,9 @@ import org.euch.elevatorsim.domain.model.body.Body
 case class LoadGroup(
     name: String,
     destinationFloor: String,
-    elements: List[Load]
+    elements: List[Load],
+    loadSpeedPPS: Double,
+    unloadSpeedPPS: Double
 ) {
   def spaceSum: Double = elements.map(_.space).sum
 

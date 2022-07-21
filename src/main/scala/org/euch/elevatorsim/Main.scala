@@ -4,14 +4,8 @@ import akka.NotUsed
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorSystem, Behavior, DispatcherSelector, Terminated}
 import org.euch.elevatorsim.Log.log
-import org.euch.elevatorsim.domain.model.controls.{
-  SimpleButtonPane,
-  StickyButton
-}
-import org.euch.elevatorsim.domain.model.dimensions.{
-  DimensionsBox,
-  DimensionsRectangle
-}
+import org.euch.elevatorsim.domain.model.controls.{SimpleButtonPane, StickyButton}
+import org.euch.elevatorsim.domain.model.dimensions.{DimensionsBox, DimensionsRectangle}
 import org.euch.elevatorsim.domain.model.doors.TwoLeafDoor
 import org.euch.elevatorsim.domain.model.portal.{Portal, SafePortalWithControls}
 import org.euch.elevatorsim.domain.model.shaft.{BaseShaft, Shaft}

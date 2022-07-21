@@ -5,7 +5,6 @@ import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import org.euch.elevatorsim.InstantUtils
 import org.euch.elevatorsim.Log.log
 import org.euch.elevatorsim.domain.model.doors.{Door, PoweredDoor}
-import org.euch.elevatorsim.simulation.door
 import org.euch.elevatorsim.simulation.winch.WinchDirection
 
 import java.time.Instant
@@ -13,8 +12,6 @@ import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.*
 
 object DoorActor {
-
-  private case class Tick(override val now: Instant) extends DoorCommand
 
   // initial state
   def apply(door: Door): Behavior[DoorCommand] =
@@ -38,12 +35,12 @@ object DoorActor {
     }
   }
 
-  private def opening(state: door.DoorState.Opening): Behavior[DoorCommand] = {
+  private def opening(state: DoorState.Opening): Behavior[DoorCommand] = {
     Behaviors.withTimers[DoorCommand] { timers =>
-      timers.startSingleTimer(Tick(Instant.now), 10.millis)
+      timers.startSingleTimer(DoorCommand.Tick(Instant.now), 10.millis)
       log.info(s"opening state: $state")
       Behaviors.receiveMessagePartial[DoorCommand] {
-        case Tick(now) if state.openPercent(now) >= 100 =>
+        case DoorCommand.Tick(now) if state.fullyOpened(now) =>
           log.info(s"${state.door.name} opening -> open")
           open(
             DoorState.Open(
@@ -67,9 +64,9 @@ object DoorActor {
     }
   }
 
-  private def open(state: door.DoorState.Open): Behavior[DoorCommand] = {
+  private def open(state: DoorState.Open): Behavior[DoorCommand] = {
     Behaviors.withTimers[DoorCommand] { timers =>
-      timers.startSingleTimer(Tick(Instant.now), 10.millis)
+      timers.startSingleTimer(DoorCommand.Tick(Instant.now), 10.millis)
       log.info(s"open state: $state")
       Behaviors.receiveMessagePartial[DoorCommand] {
         case DoorCommand.GetOpenPercent(now, replyTo) =>
@@ -83,7 +80,7 @@ object DoorActor {
               state.door
             )
           )
-        case Tick(now) =>
+        case DoorCommand.Tick(now) =>
           if (state.stayOpenSecondsOptional.nonEmpty) {
             val openTime =
               InstantUtils.diffSeconds(state.opened, now)
@@ -101,12 +98,12 @@ object DoorActor {
     }
   }
 
-  private def closing(state: door.DoorState.Closing): Behavior[DoorCommand] = {
+  private def closing(state: DoorState.Closing): Behavior[DoorCommand] = {
     Behaviors.withTimers[DoorCommand] { timers =>
-      timers.startSingleTimer(Tick(Instant.now), 10.millis)
+      timers.startSingleTimer(DoorCommand.Tick(Instant.now), 10.millis)
       log.info(s"closing state: $state")
       Behaviors.receiveMessagePartial[DoorCommand] {
-        case Tick(now) if state.openPercent(now) <= 0 =>
+        case DoorCommand.Tick(now) if state.fullyClosed(now) =>
           log.info(s"${state.door.name} closing -> closed")
           closed(
             DoorState.Closed(

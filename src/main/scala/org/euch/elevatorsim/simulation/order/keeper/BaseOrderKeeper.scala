@@ -11,8 +11,8 @@ class BaseOrderKeeper() extends OrderKeeper {
   private val maxRange = Range(Integer.MIN_VALUE, Integer.MAX_VALUE)
 
   override def setOrder(
-                         floorNum: Int,
-                         wantedDirection: OrderDirection = OrderDirection.Any
+      floorNum: Int,
+      wantedDirection: OrderDirection = OrderDirection.Any
   ): Boolean = {
     val order = keeper.Order(floorNum, wantedDirection, Instant.now())
     orders = orders ++ Set(order)

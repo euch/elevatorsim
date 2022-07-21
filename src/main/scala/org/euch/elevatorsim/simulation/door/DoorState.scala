@@ -21,6 +21,7 @@ object DoorState {
       override val door: Door
   ) extends DoorState {
     override def openPercent(now: Instant): Double = 0
+
   }
 
   case class Opening(
@@ -34,6 +35,7 @@ object DoorState {
         val p = duration * poweredDoor.openSpeedPPS
         math.min(p, 100)
       case _ => 100
+    def fullyOpened(now: Instant): Boolean = openPercent(now) == 100
   }
 
   case class Open(
@@ -54,6 +56,7 @@ object DoorState {
         val p = 100 - duration * poweredDoor.closeSpeedPPS
         math.max(0, p)
       case _ => 0
+    def fullyClosed(now: Instant): Boolean = openPercent(now) == 0
   }
 }
 

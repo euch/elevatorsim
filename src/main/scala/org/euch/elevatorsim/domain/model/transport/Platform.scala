@@ -1,10 +1,7 @@
 package org.euch.elevatorsim.domain.model.transport
 
 import org.euch.elevatorsim.domain.model.body.Body
-import org.euch.elevatorsim.domain.model.dimensions.{
-  DimensionsBox,
-  DimensionsRectangle
-}
+import org.euch.elevatorsim.domain.model.dimensions.{DimensionsBox, DimensionsRectangle}
 import org.euch.elevatorsim.domain.model.loads.Load
 import org.euch.elevatorsim.simulation.model.fitting.FittingRules
 
