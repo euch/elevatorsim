@@ -94,7 +94,7 @@ protected object WinchState {
                 case WinchDirection.Down =>
                   min(p0, t0v0.speed + w.slowDownAccelerations.downwards * t)
               }
-              log.info(s"slowdown speed = $speed")
+              // log.info(s"slowdown speed = $speed")
               speed
             case _ =>
               throw new java.lang.Exception("winch type not supported")

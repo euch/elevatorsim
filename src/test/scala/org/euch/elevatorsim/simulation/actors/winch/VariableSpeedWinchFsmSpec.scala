@@ -105,7 +105,7 @@ class VariableSpeedWinchFsmSpec
         val speed: Double = probe.receiveMessage(50.millis)
         assert(abs(speed) < runawaySpeed)
         if (abs(speed) < abs(targetSpeed)) {
-          println(s"speedUp ($descr): $speed -> $targetSpeed")
+          // println(s"speedUp ($descr): $speed -> $targetSpeed")
           waitForSpeedUp(descr, targetSpeed)
         } else {
           println(s"speed increased target reached: $speed -> $targetSpeed")
@@ -118,7 +118,7 @@ class VariableSpeedWinchFsmSpec
         val speed: Double = probe.receiveMessage(50.millis)
         assert(abs(speed) < runawaySpeed)
         if (abs(speed) > abs(targetSpeed)) {
-          println(s"slowDown ($descr): $speed -> $targetSpeed")
+          // println(s"slowDown ($descr): $speed -> $targetSpeed")
           waitForSlowDown(descr, targetSpeed)
         } else {
           println(s"speed reduced target reached: $speed -> $targetSpeed")

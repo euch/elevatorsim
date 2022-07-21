@@ -41,17 +41,14 @@ object DoorActor {
       log.info(s"opening state: $state")
       Behaviors.receiveMessagePartial[DoorCommand] {
         case DoorCommand.Tick(now) if state.fullyOpened(now) =>
-          log.info(s"${state.door.name} opening -> open")
-          open(
-            DoorState.Open(
-              now,
-              state.door,
-              state.closeTimeoutSeconds
-            )
-          )
+          openingToOpen(state, now)
         case DoorCommand.GetOpenPercent(now, replyTo) =>
           replyTo ! state.openPercent(now)
-          Behaviors.unhandled
+          if (state.fullyOpened(now)) {
+            openingToOpen(state, now)
+          } else {
+            Behaviors.unhandled
+          }
         case DoorCommand.Close(now) =>
           log.info(s"${state.door.name} opening -> closing")
           closing(
@@ -62,6 +59,17 @@ object DoorActor {
           )
       }
     }
+  }
+
+  private def openingToOpen(state: DoorState.Opening, now: Instant) = {
+    log.info(s"${state.door.name} opening -> open")
+    open(
+      DoorState.Open(
+        now,
+        state.door,
+        state.closeTimeoutSeconds
+      )
+    )
   }
 
   private def open(state: DoorState.Open): Behavior[DoorCommand] = {
@@ -104,12 +112,7 @@ object DoorActor {
       log.info(s"closing state: $state")
       Behaviors.receiveMessagePartial[DoorCommand] {
         case DoorCommand.Tick(now) if state.fullyClosed(now) =>
-          log.info(s"${state.door.name} closing -> closed")
-          closed(
-            DoorState.Closed(
-              state.door
-            )
-          )
+          closingToClosed(state)
         case DoorCommand.Open(now, closeTimeoutSeconds) =>
           log.info(s"${state.door.name} closing -> opening")
           opening(
@@ -121,9 +124,21 @@ object DoorActor {
           )
         case DoorCommand.GetOpenPercent(now, replyTo) =>
           replyTo ! state.openPercent(now)
-          Behaviors.unhandled
+          if (state.fullyClosed(now)) {
+            closingToClosed(state)
+          } else {
+            Behaviors.unhandled
+          }
       }
     }
   }
 
+  private def closingToClosed(state: DoorState.Closing) = {
+    log.info(s"${state.door.name} closing -> closed")
+    closed(
+      DoorState.Closed(
+        state.door
+      )
+    )
+  }
 }
