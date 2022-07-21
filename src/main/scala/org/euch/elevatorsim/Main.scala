@@ -11,7 +11,7 @@ import org.euch.elevatorsim.domain.model.portal.{Portal, SafePortalWithControls}
 import org.euch.elevatorsim.domain.model.shaft.{BaseShaft, Shaft}
 import org.euch.elevatorsim.domain.model.transport.Platform
 import org.euch.elevatorsim.domain.model.winch.*
-import org.euch.elevatorsim.simulation.winch.*
+import org.euch.elevatorsim.simulation.actors.winch.WinchCommand
 
 import java.time.Instant
 

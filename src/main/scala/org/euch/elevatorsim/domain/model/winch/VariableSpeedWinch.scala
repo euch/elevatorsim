@@ -1,7 +1,7 @@
 package org.euch.elevatorsim.domain.model.winch
 
 import org.euch.elevatorsim.domain.model.dimensions.Dimensions
-import org.euch.elevatorsim.simulation.winch.WinchDirection
+import org.euch.elevatorsim.simulation.actors.winch.WinchDirection
 
 case class VariableSpeedWinch(
     override val nominalSpeedUp: Double,

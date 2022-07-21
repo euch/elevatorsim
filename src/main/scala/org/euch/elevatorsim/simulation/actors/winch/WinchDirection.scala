@@ -1,4 +1,4 @@
-package org.euch.elevatorsim.simulation.winch
+package org.euch.elevatorsim.simulation.actors.winch
 
 sealed trait WinchDirection
 

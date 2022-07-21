@@ -1,11 +1,10 @@
-package org.euch.elevatorsim.simulation.load
+package org.euch.elevatorsim.simulation.actors.load
 
 import akka.actor.typed.Behavior
 import akka.actor.typed.scaladsl.Behaviors
 import org.euch.elevatorsim.Log.log
 import org.euch.elevatorsim.domain.model.loads.LoadGroup
-import org.euch.elevatorsim.simulation.door.OpenPercentAtTime
-import org.euch.elevatorsim.simulation.load.{LoadCommand, LoadState}
+import org.euch.elevatorsim.simulation.actors.door.OpenPercentAtTime
 
 import java.time.Instant
 import scala.concurrent.duration.*

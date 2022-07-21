@@ -1,4 +1,4 @@
-package org.euch.elevatorsim.simulation.load
+package org.euch.elevatorsim.simulation.actors.load
 
 import akka.actor.typed.ActorRef
 

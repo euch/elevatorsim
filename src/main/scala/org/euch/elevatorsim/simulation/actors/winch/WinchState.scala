@@ -1,4 +1,4 @@
-package org.euch.elevatorsim.simulation.winch
+package org.euch.elevatorsim.simulation.actors.winch
 
 import org.euch.elevatorsim.InstantUtils.diffSeconds
 import org.euch.elevatorsim.Log.log

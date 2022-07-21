@@ -1,10 +1,11 @@
-package org.euch.elevatorsim.simulation.door
+package org.euch.elevatorsim.simulation.actors.door
 
 import akka.actor.testkit.typed.scaladsl.{LogCapturing, ScalaTestWithActorTestKit, TestProbe}
 import org.euch.elevatorsim.domain.model.dimensions.DimensionsRectangle
 import org.euch.elevatorsim.domain.model.doors.TwoLeafDoor
 import org.euch.elevatorsim.domain.model.winch.*
-import org.euch.elevatorsim.simulation.winch.{WinchActor, WinchCommand}
+import org.euch.elevatorsim.simulation.actors.door.{DoorActor, DoorCommand}
+import org.euch.elevatorsim.simulation.actors.winch.{WinchActor, WinchCommand}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.{AnyWordSpec, AnyWordSpecLike}

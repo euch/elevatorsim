@@ -1,4 +1,4 @@
-package org.euch.elevatorsim.simulation.door
+package org.euch.elevatorsim.simulation.actors.door
 
 import akka.actor.typed.ActorRef
 

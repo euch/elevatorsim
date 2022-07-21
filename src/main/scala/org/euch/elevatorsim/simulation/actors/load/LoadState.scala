@@ -1,12 +1,12 @@
-package org.euch.elevatorsim.simulation.load
+package org.euch.elevatorsim.simulation.actors.load
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import org.euch.elevatorsim.InstantUtils
 import org.euch.elevatorsim.Log.log
 import org.euch.elevatorsim.domain.model.loads.LoadGroup
-import org.euch.elevatorsim.simulation.door.OpenPercentAtTime
-import org.euch.elevatorsim.simulation.winch.WinchDirection
+import org.euch.elevatorsim.simulation.actors.door.OpenPercentAtTime
+import org.euch.elevatorsim.simulation.actors.winch.WinchDirection
 
 import java.time.Instant
 import scala.concurrent.duration.*

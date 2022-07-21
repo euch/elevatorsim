@@ -1,10 +1,10 @@
-package org.euch.elevatorsim.simulation.winch
+package org.euch.elevatorsim.simulation.actors.winch
 
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
 import org.euch.elevatorsim.Log.log
 import org.euch.elevatorsim.domain.model.winch.*
-import org.euch.elevatorsim.simulation.winch.*
+import org.euch.elevatorsim.simulation.actors.winch.*
 
 import java.time.Instant
 import scala.concurrent.duration.*
