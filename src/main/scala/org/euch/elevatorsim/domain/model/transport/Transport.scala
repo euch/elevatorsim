@@ -7,7 +7,7 @@ import org.euch.elevatorsim.domain.model.loads.Load
 trait Transport extends Body {
   val innerDimensions: Dimensions
   val loads: List[Load]
-  val defaultFloor: Option[String]
+  val defaultFloor: Option[Int]
 
   def totalWeight: Double = weight + loads.map(_.weight).sum
 }

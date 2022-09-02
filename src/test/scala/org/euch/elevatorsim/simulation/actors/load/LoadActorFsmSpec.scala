@@ -22,7 +22,7 @@ class LoadActorFsmSpec extends ScalaTestWithActorTestKit with AnyWordSpecLike {
 
       val loadGroup = LoadGroup(
         "LoadGroup",
-        "1",
+        1,
         List(
           Passenger(
             name = "James",

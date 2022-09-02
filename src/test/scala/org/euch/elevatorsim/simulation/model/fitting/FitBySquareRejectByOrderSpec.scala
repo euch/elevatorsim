@@ -16,11 +16,11 @@ class FitBySquareRejectByOrderSpec extends AnyFlatSpec with Matchers {
     weight = 100,
     dimensions = new DimensionsBox(60, 60, 200),
     innerDimensions = new DimensionsBox(60, 60, 200),
-    defaultFloor = Some("1")
+    defaultFloor = Some(1)
   )
   private val groupA = LoadGroup(
     "GroupA",
-    "1",
+    1,
     List(
       Passenger(
         name = "Peter",
@@ -36,7 +36,7 @@ class FitBySquareRejectByOrderSpec extends AnyFlatSpec with Matchers {
 
   private val groupB = LoadGroup(
     "GroupB",
-    "1",
+    1,
     List(
       Passenger(
         name = "John",
@@ -49,7 +49,7 @@ class FitBySquareRejectByOrderSpec extends AnyFlatSpec with Matchers {
   )
   private val groupC = LoadGroup(
     "GroupC",
-    "1",
+    1,
     List(
       Passenger(
         name = "James",

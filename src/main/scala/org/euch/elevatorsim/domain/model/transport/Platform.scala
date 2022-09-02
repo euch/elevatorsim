@@ -8,10 +8,10 @@ import org.euch.elevatorsim.simulation.model.fitting.FittingRules
 import javax.print.attribute.standard.Destination
 
 class Platform(
-    override val name: String,
-    override val dimensions: DimensionsBox,
-    override val innerDimensions: DimensionsRectangle,
-    override val weight: Double,
-    override val loads: List[Load],
-    override val defaultFloor: Option[String]
-) extends Transport
+                override val name: String,
+                override val dimensions: DimensionsBox,
+                override val innerDimensions: DimensionsRectangle,
+                override val weight: Double,
+                override val loads: List[Load],
+                override val defaultFloor: Option[Int]
+              ) extends Transport
